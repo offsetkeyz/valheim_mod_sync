@@ -78,8 +78,8 @@ case $OS in
     VALHEIM_DIR="$HOME/.local/share/Steam/steamapps/common/Valheim"
     ;;
   windows)
-    DEST_DIR="C:\\Program Files (x86)\\Steam\\steamapps\\common\\Valheim\\BepInEx\\plugins"
-    VALHEIM_DIR="C:\\Program Files (x86)\\Steam\\steamapps\\common\\Valheim"
+    DEST_DIR="$HOME/../../Program Files (x86)/Steam/steamapps/common/Valheim/BepInEx/plugins"
+    VALHEIM_DIR="$HOME/../../Program Files (x86)/Steam/steamapps/common/Valheim"
     ;;
   *)
     usage
