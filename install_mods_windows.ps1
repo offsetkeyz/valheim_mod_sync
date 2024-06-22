@@ -7,50 +7,15 @@ function Show-Usage {
     exit 1
 }
 
-function Prompt-For-Directory {
-    while ($true) {
-        $DEST_DIR = Read-Host "Destination directory does not exist. Please enter the destination directory"
-        if (Test-Path -Path $DEST_DIR) {
-            Write-Host "Using existing directory: $DEST_DIR"
-            break
-        } else {
-            $yn = Read-Host "Directory does not exist. Do you want to create it? (y/n)"
-            switch ($yn) {
-                "y" {
-                    New-Item -ItemType Directory -Path $DEST_DIR
-                    Write-Host "Directory created: $DEST_DIR"
-                    break
-                }
-                "n" {
-                    Write-Host "Please enter a valid directory."
-                    continue
-                }
-                default {
-                    Write-Host "Please answer yes or no."
-                }
-            }
-        }
-    }
-}
-
 function Check-And-Install-Tools {
     if (-not (Get-Command wget -ErrorAction SilentlyContinue) -and -not (Get-Command curl -ErrorAction SilentlyContinue)) {
         Write-Host "wget and curl are not installed. Please install one of them."
         exit 1
     }
 
-    if (-not (Get-Command unzip -ErrorAction SilentlyContinue)) {
-        Write-Host "unzip is not installed. Installing unzip..."
-        if ($PSVersionTable.PSVersion.Platform -eq "Unix") {
-            if ($OSTYPE -eq "darwin") {
-                brew install unzip
-            } else {
-                sudo apt-get install unzip -y
-            }
-        } else {
-            Write-Host "Please install 'unzip' manually."
-            exit 1
-        }
+    if (-not (Get-Command Expand-Archive -ErrorAction SilentlyContinue)) {
+        Write-Host "Expand-Archive is not available. Please ensure you have PowerShell 5.0 or later."
+        exit 1
     }
 }
 
@@ -70,19 +35,9 @@ if (-not $CSVFile) {
     Show-Usage
 }
 
-# Determine the destination directory based on the operating system
-if ($PSVersionTable.PSVersion.Platform -eq "Unix") {
-    if ($OSTYPE -eq "darwin") {
-        $DEST_DIR = "$HOME/Library/Application Support/Steam/steamapps/common/Valheim/BepInEx/plugins"
-        $VALHEIM_DIR = "$HOME/Library/Application Support/Steam/steamapps/common/Valheim"
-    } else {
-        $DEST_DIR = "$HOME/.local/share/Steam/steamapps/common/Valheim/BepInEx/plugins"
-        $VALHEIM_DIR = "$HOME/.local/share/Steam/steamapps/common/Valheim"
-    }
-} else {
-    Write-Host "Unsupported operating system."
-    exit 1
-}
+# Set the destination directory
+$DEST_DIR = "C:\Program Files (x86)\Steam\steamapps\common\Valheim\BepInEx\plugins"
+$VALHEIM_DIR = "C:\Program Files (x86)\Steam\steamapps\common\Valheim"
 
 # Check and install required tools
 Check-And-Install-Tools
