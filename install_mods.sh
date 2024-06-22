@@ -3,7 +3,7 @@
 # Function to display usage information
 usage() {
   echo "Usage: $0 -o <operating_system> -c <csv_file>"
-  echo "Operating Systems: macos, steamdeck"
+  echo "Operating Systems: macos, steamdeck, windows"
   exit 1
 }
 
@@ -76,6 +76,10 @@ case $OS in
   steamdeck)
     DEST_DIR="$HOME/.local/share/Steam/steamapps/common/Valheim/BepInEx/plugins"
     VALHEIM_DIR="$HOME/.local/share/Steam/steamapps/common/Valheim"
+    ;;
+  windows)
+    DEST_DIR="C:\\Program Files (x86)\\Steam\\steamapps\\common\\Valheim\\BepInEx\\plugins"
+    VALHEIM_DIR="C:\\Program Files (x86)\\Steam\\steamapps\\common\\Valheim"
     ;;
   *)
     usage
