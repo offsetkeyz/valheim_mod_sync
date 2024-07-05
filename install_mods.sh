@@ -2,8 +2,9 @@
 
 # Function to display usage information
 usage() {
-  echo "Usage: $0 -o <operating_system> -c <csv_file>"
+  echo "Usage: $0 -o <operating_system> -c <csv_file> OPTIONAL"
   echo "Operating Systems: macos, steamdeck, windows"
+  echo "Default CSV is requirements.csv included in the package."
   exit 1
 }
 
@@ -63,22 +64,22 @@ while getopts "o:c:" opt; do
 done
 
 # Check if both arguments are provided
-if [ -z "$OS" ] || [ -z "$CSV_FILE" ]; then
+if [ -z "$OS" ]; then
   usage
 fi
 
 # Set the destination directory based on the operating system
 case $OS in
   macos)
-    DEST_DIR="$HOME/Library/Application Support/Steam/steamapps/common/Valheim/BepInEx/plugins"
+    DEST_DIR="$HOME/Library/Application Support/Steam/steamapps/common/Valheim/BepInEx"
     VALHEIM_DIR="$HOME/Library/Application Support/Steam/steamapps/common/Valheim"
     ;;
   steamdeck)
-    DEST_DIR="$HOME/.local/share/Steam/steamapps/common/Valheim/BepInEx/plugins"
+    DEST_DIR="$HOME/.local/share/Steam/steamapps/common/Valheim/BepInEx"
     VALHEIM_DIR="$HOME/.local/share/Steam/steamapps/common/Valheim"
     ;;
   windows)
-    DEST_DIR="$HOME/../../Program Files (x86)/Steam/steamapps/common/Valheim/BepInEx/plugins"
+    DEST_DIR="$HOME/../../Program Files (x86)/Steam/steamapps/common/Valheim/BepInEx"
     VALHEIM_DIR="$HOME/../../Program Files (x86)/Steam/steamapps/common/Valheim"
     ;;
   *)
@@ -86,11 +87,17 @@ case $OS in
     ;;
 esac
 
+# Get the directory of the currently running script
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+CONFIG_DIR="${SCRIPT_DIR}/config"
+
+
 # Check and install required tools
 check_and_install_tools
 
 # Check if the destination directory exists, if not download BepInExPack
-if [ ! -d "$DEST_DIR" ]; then
+if [ ! -d "$DEST_DIR/plugins" ]; then
   echo "Destination directory does not exist. Downloading BepInExPack..."
   BEPINEX_URL="https://thunderstore.io/package/download/denikson/BepInExPack_Valheim/5.4.2202/"
   download_file "$BEPINEX_URL" "BepInExPack_Valheim.zip"
@@ -104,6 +111,11 @@ fi
 # Clear the destination directory
 rm -rf "$DEST_DIR"
 mkdir -p "$DEST_DIR"
+
+# Check if both arguments are provided
+if [ -z "$CSV_FILE" ]; then
+  CSV_FILE="$SCRIPT_DIR/requirements.csv"
+fi
 
 # Read the CSV file line by line
 while IFS=, read -r ModName Author Date Version; do
@@ -119,7 +131,7 @@ while IFS=, read -r ModName Author Date Version; do
   download_file "$URL" "${ModName}.zip"
 
   # Create a directory for the mod
-  MOD_DIR="${DEST_DIR}/${ModName}"
+  MOD_DIR="${DEST_DIR}/plugins/${ModName}"
   mkdir -p "$MOD_DIR"
 
   # Extract the mod into its own folder
@@ -129,5 +141,11 @@ while IFS=, read -r ModName Author Date Version; do
   rm "${ModName}.zip"
 
 done < "$CSV_FILE"
+
+echo "Removing config files..."
+rm -rf "$DEST_DIR/config"
+echo "Copying config files..."
+cp -r "$CONFIG_DIR" "$DEST_DIR/config" -v
+
 
 echo "All mods have been downloaded and extracted to $DEST_DIR."
