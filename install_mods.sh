@@ -125,12 +125,12 @@ if [ ! -d "$DEST_DIR/plugins" ]; then
   sed -i '$ d' $START_GAME_SCRIPT  # Remove the last line
   sed -i '$ d' $START_GAME_SCRIPT  # Remove the second last line
 
-  echo '    exec "$exec" --console' >> $START_GAME_SCRIPT
+  echo '    exec "$exec" -console' >> $START_GAME_SCRIPT
   echo 'fi' >> $START_GAME_SCRIPT
   echo "Verifying the contents of start_server_bepinex.sh"
 
   # Define the expected hash
-  EXPECTED_HASH="7c933f7dd57b52e892883f738077c28d47b273a66ed6009e28fad20e2d1996c6"
+  EXPECTED_HASH="4d7ee00db93c456b88beecd763acca844f0a1f5cc8afbdd0a0066fddabf4bfed"
 
   # Compute the actual hash of the file
   ACTUAL_HASH=$(sha256sum "$START_GAME_SCRIPT" | awk '{ print $1 }')
