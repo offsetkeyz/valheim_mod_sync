@@ -109,8 +109,8 @@ if [ ! -d "$DEST_DIR/plugins" ]; then
 fi
 
 # Clear the destination directory
-rm -rf "$DEST_DIR"
-mkdir -p "$DEST_DIR"
+rm -rf "$DEST_DIR/plugins"
+mkdir -p "$DEST_DIR/plugins"
 
 # Check if both arguments are provided
 if [ -z "$CSV_FILE" ]; then
