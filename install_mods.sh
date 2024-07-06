@@ -106,7 +106,45 @@ if [ ! -d "$DEST_DIR/plugins" ]; then
   mv "$TEMP_DIR"/*/* "$VALHEIM_DIR"
   rm -r "$TEMP_DIR"
   rm "BepInExPack_Valheim.zip"
+
+  echo "Changing to $VALHEIM_DIR directory"
+  cd "$VALHEIM_DIR"
+
+  START_GAME_SCRIPT="start_game_bepinex.sh"
+
+  echo "Setting executable permissions for start_server_bepinex.sh"
+  chmod u+x $START_GAME_SCRIPT
+
+  if [ -x $START_GAME_SCRIPT ]; then
+    echo "Permissions successfully changed."
+  else
+    echo "Failed to change permissions."
+  fi
+
+  echo "Modifying the last lines of start_server_bepinex.sh"
+  sed -i '$ d' $START_GAME_SCRIPT  # Remove the last line
+  sed -i '$ d' $START_GAME_SCRIPT  # Remove the second last line
+
+  echo '    exec "$exec" --console' >> $START_GAME_SCRIPT
+  echo 'fi' >> $START_GAME_SCRIPT
+  echo "Verifying the contents of start_server_bepinex.sh"
+
+  # Define the expected hash
+  EXPECTED_HASH="7c933f7dd57b52e892883f738077c28d47b273a66ed6009e28fad20e2d1996c6"
+
+  # Compute the actual hash of the file
+  ACTUAL_HASH=$(sha256sum "$START_GAME_SCRIPT" | awk '{ print $1 }')
+
+    # Compare the actual hash with the expected hash
+  if [ "$ACTUAL_HASH" == "$EXPECTED_HASH" ]; then
+      echo "Hash matches: $ACTUAL_HASH"
+  else
+      echo "Hash does not match. Expected: $EXPECTED_HASH, but got: $ACTUAL_HASH"
+  fi
+
 fi
+
+
 
 # Clear the destination directory
 rm -rf "$DEST_DIR/plugins"
